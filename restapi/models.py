@@ -24,6 +24,10 @@ class Account(models.Model):
         return password == bcrypt.checkpw(password, self.passwordhash)
 
 
+# Will be removed and randomized before production
+DEVEL_SALT = b'$2b$12$YEXaMZIuPcmlXMM.HSlMOOxUtHbakexjGK7zlQD8JVfz7aUVsAMqW'
+
+
 class Token(models.Model):
     """
     Token that is used to identify the account. Can be multiple
@@ -32,6 +36,19 @@ class Token(models.Model):
 
     serialhash = models.CharField(max_length=64)
     account = models.ForeignKey(Account)
+
+    @staticmethod
+    def find_token(serial):
+        hash = Token.hash_token(serial)
+        return Token.objects.filter(serialhash=hash).first()
+
+
+    @staticmethod
+    def hash_token(serial):
+        return bcrypt.hashpw(serial, DEVEL_SALT)
+
+    def set_hash(self, serial):
+        self.serialhash = self.hash_token(serial)
 
 
 class Transaction(models.Model):

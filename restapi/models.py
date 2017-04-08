@@ -1,6 +1,7 @@
 from django.db import models
 
 import bcrypt
+import hashlib
 
 
 class Account(models.Model):
@@ -24,10 +25,6 @@ class Account(models.Model):
         return password == bcrypt.checkpw(password, self.passwordhash)
 
 
-# Will be removed and randomized before production
-DEVEL_SALT = b'$2b$12$YEXaMZIuPcmlXMM.HSlMOOxUtHbakexjGK7zlQD8JVfz7aUVsAMqW'
-
-
 class Token(models.Model):
     """
     Token that is used to identify the account. Can be multiple
@@ -39,13 +36,12 @@ class Token(models.Model):
 
     @staticmethod
     def find_token(serial):
-        hash = Token.hash_token(serial)
-        return Token.objects.filter(serialhash=hash).first()
-
+        needle_hash = Token.hash_token(serial)
+        return Token.objects.filter(serialhash=needle_hash).first()
 
     @staticmethod
     def hash_token(serial):
-        return bcrypt.hashpw(serial, DEVEL_SALT)
+        return hashlib.sha256(serial.decode("UTF-8")).digest()
 
     def set_hash(self, serial):
         self.serialhash = self.hash_token(serial)

@@ -18,6 +18,9 @@ class Account(models.Model):
     # Balance in cents
     balance = models.IntegerField(default=0)
 
+    def __str__(self):
+        return "Account: " + self.name + "(" + str(self.balance) + ")"
+
     def set_password(self, password):
         self.passwordhash = bcrypt.hashpw(password, bcrypt.gensalt())
 
@@ -32,7 +35,7 @@ class Token(models.Model):
     creation_date = models.DateTimeField()
 
     serialhash = models.CharField(max_length=64)
-    account = models.ForeignKey(Account)
+    account = models.ForeignKey(Account, null=True)
 
     @staticmethod
     def find_token(serial):
@@ -41,7 +44,10 @@ class Token(models.Model):
 
     @staticmethod
     def hash_token(serial):
-        return hashlib.sha256(serial.decode("UTF-8")).digest()
+        return hashlib.sha256(serial.encode()).hexdigest()
+
+    def __str__(self):
+        return "Token: " + self.serialhash
 
     def set_hash(self, serial):
         self.serialhash = self.hash_token(serial)

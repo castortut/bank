@@ -47,9 +47,8 @@ def view_token_transaction(request, token_serial):
     token = Token.find_token(token_serial)
     if token is not None:
         if token.account is not None:
-            if token.account.balance + int(request.POST['amount']) >= 0:
-                token.account.balance += int(request.POST['amount'])
-                token.account.save()
+            transaction = Transaction(account=token.account, amount=int(request.POST['amount']))
+            if transaction.run().was_success():
                 return transaction_response(token.account.name, token.account.balance)
             else:
                 return error_response("Insufficient balance")
@@ -57,7 +56,3 @@ def view_token_transaction(request, token_serial):
             return error_response("Token not registered", "Please register")
     else:
         return new_token(token_serial)
-
-
-def view_hello(request):
-    return HttpResponse("Hello")

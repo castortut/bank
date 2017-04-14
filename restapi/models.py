@@ -47,7 +47,7 @@ class Token(models.Model):
         return hashlib.sha256(serial.encode()).hexdigest()
 
     def __str__(self):
-        return "Token: " + self.serialhash
+        return "Token: " + self.serialhash + (" (" + self.account.name + ")" if self.account else "")
 
     def set_hash(self, serial):
         self.serialhash = self.hash_token(serial)
@@ -63,6 +63,9 @@ class Transaction(models.Model):
     account = models.ForeignKey(Account)
 
     success = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "Transaction: " + self.account.name + ", %.2f" % self.amount
 
     def run(self):
         if self.account.balance + self.amount >= 0:

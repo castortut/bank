@@ -47,7 +47,7 @@ def view_token_transaction(request, token_serial):
     token = Token.find_token(token_serial)
     if token is not None:
         if token.account is not None:
-            transaction = Transaction(account=token.account, amount=int(request.POST['amount']))
+            transaction = Transaction(date=datetime.datetime.now(), account=token.account, amount=int(request.POST['amount']))
             if transaction.run().was_success():
                 return transaction_response(token.account.name, token.account.balance)
             else:

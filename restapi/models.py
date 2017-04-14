@@ -61,3 +61,19 @@ class Transaction(models.Model):
 
     amount = models.IntegerField()
     account = models.ForeignKey(Account)
+
+    success = models.BooleanField(default=False)
+
+    def run(self):
+        if self.account.balance + self.amount >= 0:
+            self.account.balance += self.amount
+            self.account.save()
+            self.success = True
+        else:
+            self.success = False
+
+        self.save()
+        return self
+
+    def was_success(self):
+        return self.success

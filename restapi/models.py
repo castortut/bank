@@ -62,10 +62,12 @@ class Transaction(models.Model):
     amount = models.IntegerField()
     account = models.ForeignKey(Account)
 
+    message = models.TextField(default="")
+
     success = models.BooleanField(default=False)
 
     def __str__(self):
-        return "Transaction: " + self.account.name + ", %.2f" % self.amount
+        return "Transaction: " + self.account.name + ", %.2f" % self.amount + ", " + self.message
 
     def run(self):
         if self.account.balance + self.amount >= 0:

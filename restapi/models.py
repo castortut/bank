@@ -35,7 +35,7 @@ class Token(models.Model):
     creation_date = models.DateTimeField()
 
     serialhash = models.CharField(max_length=64)
-    account = models.ForeignKey(Account, null=True)
+    account = models.ForeignKey(Account, null=True, on_delete=models.SET_NULL)
 
     @staticmethod
     def find_token(serial):
@@ -60,7 +60,7 @@ class Transaction(models.Model):
     date = models.DateTimeField()
 
     amount = models.IntegerField()
-    account = models.ForeignKey(Account)
+    account = models.ForeignKey(Account, on_delete=models.PROTECT)
 
     message = models.TextField(default="")
 
